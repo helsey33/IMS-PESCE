@@ -1,0 +1,39 @@
+@import "../styles/variables";
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 100vh;
+  overflow: hidden;
+}
+
+.right_image {
+  background: url("../../img/2.JPG") center center no-repeat;
+  background-size: cover;
+}
+
+.form_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .or {
+    line-height: 3.5em;
+  }
+  .wrapper {
+    // background: #eee;
+    margin: 40px;
+    padding: 30px;
+  }
+}
+
+.reg_form {
+  padding: 30px;
+  min-height: 500px;
+  .reg_form__child {
+    margin: 20px 0;
+  }
+  .reg_form__action {
+    padding: 10px 80px;
+    margin: 30px;
+  }
+}

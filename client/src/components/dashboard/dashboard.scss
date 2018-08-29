@@ -1,0 +1,21 @@
+@import "./../styles/variables";
+
+.dashboard_container {
+  margin: 50px;
+  font-family: "Gotham", serif;
+  .center_text {
+    margin-top: 200px;
+    font-weight: 600;
+    color: #a9a9;
+    font-size: 200px;
+  }
+  .logout {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: $error;
+    &:hover {
+      background: lighten($error, 10);
+    }
+  }
+}
