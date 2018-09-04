@@ -40,13 +40,6 @@ const dashboardRoutes = [
     component: TableList
   },
   // {
-  //   path: "/typography",
-  //   sidebarName: "Typography",
-  //   navbarName: "Typography",
-  //   icon: LibraryBooks,
-  //   component: Typography
-  // },
-  // {
   //   path: "/icons",
   //   sidebarName: "Icons",
   //   navbarName: "Icons",
@@ -74,7 +67,37 @@ const dashboardRoutes = [
   //   icon: Unarchive,
   //   component: UpgradeToPro
   // },
-  { redirect: true, path: "/", to: "/dashboard", navbarName: "Redirect" }
+  { redirect: true, path: "/", to: "/dashboard", navbarName: "Redirect" },
+  {
+    redirect: true,
+    path: "/createprofile",
+    to: "/createprofile",
+    navbarName: "Create Profile"
+  },
+  {
+    redirect: true,
+    path: "/addgraduation",
+    to: "/addgraduation",
+    navbarName: "Add UG and PG Details"
+  },
+  {
+    redirect: true,
+    path: "/addpregrad",
+    to: "/addpregrad",
+    navbarName: "Add pre-graduation details"
+  },
+  {
+    redirect: true,
+    path: "/addworkexperience",
+    to: "/addworkexperience",
+    navbarName: "Add Work Experience"
+  },
+  {
+    redirect: true,
+    path: "/addproject",
+    to: "/addproject",
+    navbarName: "Add Project Details"
+  }
 ];
 
 export default dashboardRoutes;

@@ -19,8 +19,20 @@ import dashboardStyle from "../../assets/jss/material-dashboard-react/layouts/da
 import image from "../../assets/img/sidebar-2.jpg";
 import logo from "../../assets/img/reactlogo.png";
 
+//Manual routes
+import CreateProfile from "./../../views/UserProfile/CreateProfile";
+import AddGraduation from "./../../views/UserProfile/AddGraduation";
+import AddPreGrad from "./../../views/UserProfile/AddPreGrad";
+import WorkExperience from "./../../views/UserProfile/WorkExperience";
+import AddProject from "./../../views/UserProfile/AddProject";
+
 const switchRoutes = (
   <Switch>
+    <Route path="/createprofile" component={CreateProfile} />
+    <Route path="/addgraduation" component={AddGraduation} />
+    <Route path="/addpregrad" component={AddPreGrad} />
+    <Route path="/addworkexperience" component={WorkExperience} />
+    <Route path="/addproject" component={AddProject} />
     {dashboardRoutes.map((prop, key) => {
       if (prop.redirect)
         return <Redirect from={prop.path} to={prop.to} key={key} />;

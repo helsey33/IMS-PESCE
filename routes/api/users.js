@@ -76,12 +76,17 @@ router.post("/login", (req, res) => {
       .then(isMatch => {
         if (isMatch) {
           const payload = { id: user.id, name: user.name };
-          jwt.sign(payload, keys.secret, { expiresIn: 3600 }, (err, token) => {
-            res.json({
-              success: true,
-              token: "Bearer " + token
-            });
-          });
+          jwt.sign(
+            payload,
+            keys.secret,
+            { expiresIn: 3600 * 24 * 7 },
+            (err, token) => {
+              res.json({
+                success: true,
+                token: "Bearer " + token
+              });
+            }
+          );
         } else {
           errors.password = "Password Incorrect";
           res.status(400).json(errors);

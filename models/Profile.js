@@ -10,6 +10,10 @@ const ProfileSchema = new Schema({
     type: Boolean,
     default: false
   },
+  displayImage: {
+    type: String,
+    default: "uploads/default-user-profile-picture-3.png"
+  },
   handle: {
     type: String,
     default: null
@@ -45,7 +49,7 @@ const ProfileSchema = new Schema({
         required: true
       },
       year: {
-        type: Date,
+        type: String,
         required: true
       },
       percentage: {
@@ -68,7 +72,7 @@ const ProfileSchema = new Schema({
         required: true
       },
       year: {
-        type: Date,
+        type: String,
         required: true
       },
       percentage: {
@@ -82,7 +86,7 @@ const ProfileSchema = new Schema({
         type: String,
         required: true
       },
-      designation: {
+      exp_designation: {
         type: String,
         required: true
       },
@@ -91,7 +95,7 @@ const ProfileSchema = new Schema({
         required: true
       },
       to: {
-        type: Date
+        type: String
       }
     }
   ],
@@ -105,7 +109,7 @@ const ProfileSchema = new Schema({
         required: true
       },
       year: {
-        type: Date,
+        type: String,
         required: true
       }
     }

@@ -1,8 +1,8 @@
 const cardAvatarStyle = {
   cardAvatar: {
     "&$cardAvatarProfile img": {
-      width: "100%",
-      height: "auto"
+      height: 130,
+      width: 130
     }
   },
   cardAvatarProfile: {

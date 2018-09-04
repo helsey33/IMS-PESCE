@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const passport = require("passport");
 const moment = require("moment");
+const multer = require("multer");
 
 //Load Profile Model
 const Profile = require("../../models/Profile");
@@ -13,6 +14,51 @@ const validateGradDetailsInput = require("../../validation/grad_details");
 const validatePreGradInput = require("../../validation/pre_grad");
 const validateExperienceInput = require("../../validation/experience");
 const validateGradProjectInput = require("../../validation/grad_project");
+
+//Multer config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.user.id + "_" + file.originalname);
+  }
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype === "image/jpeg" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/png"
+    ) {
+      cb(null, true);
+    } else {
+      cb("Error : Only images allowed");
+    }
+  }
+}).single("displayImage");
+
+//@route POST /profilePic : Private => Upload an image to the server
+router.post(
+  "/profilePic",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    upload(req, res, err => {
+      if (err) {
+        res.status(400).json(err);
+      } else {
+        Profile.findOne({ user: req.user.id }).then(profile => {
+          profile.displayImage = req.file.path;
+          profile.save().then(profile => {
+            res.json(profile);
+          });
+        });
+      }
+    });
+  }
+);
 
 //@route GET /profile  : Private
 router.get(
@@ -53,7 +99,7 @@ router.get("/handle/:handle", (req, res) => {
   const errors = {};
 
   Profile.findOne({ handle: req.params.handle })
-    .populate("user", ["name", "avatar"])
+    .populate("user", ["name"])
     .then(profile => {
       if (!profile) {
         errors.noprofile = "There is no profile for this user.";
@@ -141,10 +187,28 @@ router.post(
       };
       if (req.body.percentage) newDetails.percentage = req.body.percentage;
       //Add graduation details
-      profile.pg_and_ug.unshift(newDetails);
+      profile.pg_and_ug.push(newDetails);
 
       profile.save().then(profile => res.json(profile));
     });
+  }
+);
+
+//@route DELETE /profile/grad_details/:grad_id
+router.delete(
+  "/grad_details/:grad_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        const removeIndex = profile.pg_and_ug
+          .map(item => item.id)
+          .indexOf(req.params.grad_id);
+        //Splice out of array
+        profile.pg_and_ug.splice(removeIndex, 1);
+        profile.save().then(profile => res.json(profile));
+      })
+      .catch(err => res.status(404).json(err));
   }
 );
 
@@ -166,10 +230,28 @@ router.post(
       };
       if (req.body.percentage) newDetails.percentage = req.body.percentage;
       //Add pre-graduation details
-      profile.pre_graduation.unshift(newDetails);
+      profile.pre_graduation.push(newDetails);
 
       profile.save().then(profile => res.json(profile));
     });
+  }
+);
+
+//@route DELETE /profile/pre_grad/:pgrad_id
+router.delete(
+  "/pre_grad/:pgrad_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        const removeIndex = profile.pre_graduation
+          .map(item => item.id)
+          .indexOf(req.params.pgrad_id);
+        //Splice out of array
+        profile.pre_graduation.splice(removeIndex, 1);
+        profile.save().then(profile => res.json(profile));
+      })
+      .catch(err => res.status(404).json(err));
   }
 );
 
@@ -185,15 +267,33 @@ router.post(
     Profile.findOne({ user: req.user.id }).then(profile => {
       const newDetails = {
         organisation: req.body.organisation,
-        designation: req.body.designation,
+        exp_designation: req.body.exp_designation,
         from: req.body.from
       };
       if (req.body.to) newDetails.to = req.body.to;
       //Add pre-graduation details
-      profile.work_experience.unshift(newDetails);
+      profile.work_experience.push(newDetails);
 
       profile.save().then(profile => res.json(profile));
     });
+  }
+);
+
+//@route DELETE /profile/experience/:exp_id
+router.delete(
+  "/experience/:exp_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        const removeIndex = profile.work_experience
+          .map(item => item.id)
+          .indexOf(req.params.exp_id);
+        //Splice out of array
+        profile.work_experience.splice(removeIndex, 1);
+        profile.save().then(profile => res.json(profile));
+      })
+      .catch(err => res.status(404).json(err));
   }
 );
 
@@ -212,10 +312,28 @@ router.post(
         year: req.body.year
       };
       //Add pre-graduation details
-      profile.project_at_pg_ug.unshift(newDetails);
+      profile.project_at_pg_ug.push(newDetails);
 
       profile.save().then(profile => res.json(profile));
     });
+  }
+);
+
+//@route DELETE /profile/grad_project/:project_id
+router.delete(
+  "/grad_project/:project_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        const removeIndex = profile.project_at_pg_ug
+          .map(item => item.id)
+          .indexOf(req.params.project_id);
+        //Splice out of array
+        profile.project_at_pg_ug.splice(removeIndex, 1);
+        profile.save().then(profile => res.json(profile));
+      })
+      .catch(err => res.status(404).json(err));
   }
 );
 
