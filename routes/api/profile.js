@@ -18,7 +18,7 @@ const validateGradProjectInput = require("../../validation/grad_project");
 //Multer config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./uploads/");
+    cb(null, "./uploads/displayImage/");
   },
   filename: (req, file, cb) => {
     cb(null, req.user.id + "_" + file.originalname);

@@ -6,13 +6,9 @@ const ProfileSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "users"
   },
-  admin: {
-    type: Boolean,
-    default: false
-  },
   displayImage: {
     type: String,
-    default: "uploads/default-user-profile-picture-3.png"
+    default: "uploads/displayImage/default-user-profile-picture-3.png"
   },
   handle: {
     type: String,

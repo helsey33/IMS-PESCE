@@ -7,6 +7,8 @@ const User = require("./models/User");
 //Bring in routes
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
+const conference = require("./routes/api/conference");
+const journal = require("./routes/api/journal");
 
 const app = express();
 
@@ -37,6 +39,8 @@ require("./config/passport")(passport);
 //Use routes
 app.use("/api/users", users);
 app.use("/api/profile", profile);
+app.use("/api/conference", conference);
+app.use("/api/journal", journal);
 
 const port = process.env.PORT || 5000;
 
