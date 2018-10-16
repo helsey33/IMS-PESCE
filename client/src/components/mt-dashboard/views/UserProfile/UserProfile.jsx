@@ -255,7 +255,7 @@ class UserProfile extends Component {
                     htmlFor="raised-button-file"
                     style={{ cursor: "pointer" }}
                   >
-                    <img src={this.state.displayImage} alt="..." />
+                    <img src={this.state.displayImage} alt="Profile_Image" />
                   </label>
                 </CardAvatar>
                 <CardBody profile>

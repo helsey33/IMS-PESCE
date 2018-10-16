@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const multer = require("multer");
+var path = require("path");
 
 //Bring in the models
 const Journal = require("../../models/Journal");
@@ -36,18 +37,33 @@ const uploadPaper = multer({
 
 //@route POST journal/uploadPaper : Private
 router.post(
-  "/uploadPaper",
+  "/uploadPaper/:id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     uploadPaper(req, res, err => {
       if (err) res.status(400).json(err);
       else
-        Journal.findOne({ user: req.user.id }).then(journal => {
-          journal.paper = req.file.path;
-          journal.save().then(journal => {
-            res.json(journal);
-          });
+        Journal.findOneAndUpdate(
+          { "journalData._id": req.params.id },
+          { $set: { "journalData.$.paper": req.file.path } },
+          { new: true }
+        ).then(journal => {
+          res.json(journal);
         });
+    });
+  }
+);
+
+//@route GET journal/downloadPaper : Private
+router.get(
+  "/downloadPaper/:jid",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Journal.findOne({ user: req.user.id }).then(journal => {
+      const jData = journal.journalData.find(
+        item => item.id === req.params.jid
+      );
+      res.download(jData.paper);
     });
   }
 );
@@ -62,7 +78,7 @@ router.post(
       return res.status(400).json(errors);
     }
 
-    const journalFields = {
+    const journalData = {
       jType: req.body.jType,
       paperTitle: req.body.paperTitle,
       jTitle: req.body.jTitle,
@@ -70,24 +86,31 @@ router.post(
       issue: req.body.issue,
       pageNos: req.body.pageNos,
       publishDate: req.body.publishDate,
-      pageNos: req.body.pageNos,
-      ugcApproved: req.body.ugcApproved,
       issnNo: req.body.issnNo,
-      user: req.user.id,
-      authors: req.body.authors.split(",")
+      ugcApproved: req.body.ugcApproved,
+      authors: req.body.authors,
+      indexedBy: req.body.indexedBy
     };
-    if (req.body.publisher) journalFields.publisher = req.body.publisher;
-    if (req.body.onlineLink) journalFields.onlineLink = req.body.onlineLink;
-    //TODO : Setup indexedBy
+    if (req.body.publisher) journalData.publisher = req.body.publisher;
+    if (req.body.onlineLink) journalData.onlineLink = req.body.onlineLink;
+    //TODO : indexed By
+    journalData.indexedBy = req.body.indexedBy;
     Journal.findOne({ user: req.user.id }).then(journal => {
-      if (journal) {
-        Journal.findOneAndUpdate(
-          { user: req.user.id },
-          { $set: journalFields },
-          { new: true }
-        ).then(journal => res.json(journal));
+      if (!journal) {
+        journalField = {
+          user: req.user.id,
+          journalData
+        };
+        new Journal(journalField)
+          .save()
+          .then(journal => res.json(journal))
+          .catch(err => {
+            res.json("error from mongoose");
+            console.log(err);
+          });
       } else {
-        new Journal(journalFields)
+        journal.journalData.push(journalData);
+        journal
           .save()
           .then(journal => res.json(journal))
           .catch(err => {
@@ -99,7 +122,7 @@ router.post(
   }
 );
 
-//@route GET / : Get journal details : Private
+//@route GET /journal : Get journal details : Private
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
@@ -122,7 +145,7 @@ router.get(
   }
 );
 
-//@route GET /all : Get all journal details
+//@route GET /journal/all : Get all journal details
 router.get("/all", (req, res) => {
   const errors = {};
   Journal.find()
@@ -141,4 +164,20 @@ router.get("/all", (req, res) => {
     });
 });
 
+//@route DELETE /journal/:jid
+router.delete(
+  "/:jid",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Journal.findOne({ user: req.user.id })
+      .then(journal => {
+        const removeIndex = journal.journalData
+          .map(item => item.id)
+          .indexOf(req.params.jid);
+        journal.journalData.splice(removeIndex, 1);
+        journal.save().then(journal => res.json(journal));
+      })
+      .catch(err => res.status(400).res(err));
+  }
+);
 module.exports = router;

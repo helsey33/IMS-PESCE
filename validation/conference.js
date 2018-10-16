@@ -32,6 +32,9 @@ module.exports = data => {
   if (Validator.isEmpty(data.isbnNo)) {
     errors.isbnNo = "ISBN No required";
   }
+  if (!Validator.matches(data.conferenceDate, /^\d{2}\/\d{4}$/g)) {
+    errors.conferenceDate = "Format of the date is mm/yyyy";
+  }
 
   if (Validator.isEmpty(data.publisher)) {
     errors.publisher = "Publisher required";

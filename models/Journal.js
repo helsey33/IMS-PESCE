@@ -6,58 +6,70 @@ const JournalSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "users"
   },
-  jType: {
-    type: String,
-    required: true
-  },
-  paperTitle: {
-    type: String,
-    required: true
-  },
-  authors: {
-    type: [String],
-    required: true
-  },
-  jTitle: {
-    type: String,
-    required: true
-  },
-  volume: {
-    type: String,
-    required: true
-  },
-  issue: {
-    type: String,
-    requried: true
-  },
-  pageNos: {
-    type: Number,
-    required: true
-  },
-  publishDate: {
-    type: Date,
-    required: true
-  },
-  issnNo: {
-    type: Number,
-    required: true
-  },
-  publisher: {
-    type: String
-  },
-  onlineLink: {
-    type: String
-  },
-  indexedBy: {
-    type: String
-  },
-  ugcApproved: {
-    type: String,
-    required: true
-  },
-  paper: {
-    type: String
-  }
+  journalData: [
+    {
+      jType: {
+        type: String,
+        required: true
+      },
+      paperTitle: {
+        type: String,
+        required: true
+      },
+      authors: {
+        type: String,
+        required: true
+      },
+      jTitle: {
+        type: String,
+        required: true
+      },
+      volume: {
+        type: String,
+        required: true
+      },
+      issue: {
+        type: String,
+        requried: true
+      },
+      pageNos: {
+        type: String,
+        required: true
+      },
+      publishDate: {
+        type: String,
+        required: true
+      },
+      issnNo: {
+        type: String,
+        required: true
+      },
+      publisher: {
+        type: String
+      },
+      onlineLink: {
+        type: String
+      },
+      indexedBy: {
+        webOfScience: {
+          type: Boolean
+        },
+        scopus: {
+          type: Boolean
+        },
+        indianCitationIndex: {
+          type: Boolean
+        }
+      },
+      ugcApproved: {
+        type: String,
+        required: true
+      },
+      paper: {
+        type: String
+      }
+    }
+  ]
 });
 
-module.exports = Jounral = mongoose.model("jounral", JournalSchema);
+module.exports = Journal = mongoose.model("jounral", JournalSchema);

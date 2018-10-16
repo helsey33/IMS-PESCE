@@ -1,6 +1,8 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
+import Forum from "@material-ui/icons/Forum";
+import ChromeReaderMode from "@material-ui/icons/ChromeReaderMode";
 // import ContentPaste from "@material-ui/icons/ContentPaste";
 // import LibraryBooks from "@material-ui/icons/LibraryBooks";
 // import BubbleChart from "@material-ui/icons/BubbleChart";
@@ -10,12 +12,8 @@ import Person from "@material-ui/icons/Person";
 // core components/views
 import DashboardPage from "../views/Dashboard/Dashboard.jsx";
 import UserProfile from "../views/UserProfile/UserProfile.jsx";
-import TableList from "../views/TableList/TableList.jsx";
-// import Typography from "../views/Typography/Typography.jsx";
-// import Icons from "../views/Icons/Icons.jsx";
-// import Maps from "../views/Maps/Maps.jsx";
-// import NotificationsPage from "../views/Notifications/Notifications.jsx";
-// import UpgradeToPro from "../views/UpgradeToPro/UpgradeToPro.jsx";
+import Conference from "../views/C&J/Conference";
+import Journal from "../views/C&J/Journal";
 
 const dashboardRoutes = [
   {
@@ -33,11 +31,18 @@ const dashboardRoutes = [
     component: UserProfile
   },
   {
-    path: "/table",
-    sidebarName: "Table List",
-    navbarName: "Table List",
-    icon: "content_paste",
-    component: TableList
+    path: "/conference",
+    sidebarName: "Conference",
+    navbarName: "Conference",
+    icon: Forum,
+    component: Conference
+  },
+  {
+    path: "/journal",
+    sidebarName: "Journal",
+    navbarName: "Journal",
+    icon: ChromeReaderMode,
+    component: Journal
   },
   // {
   //   path: "/icons",
@@ -97,6 +102,18 @@ const dashboardRoutes = [
     path: "/addproject",
     to: "/addproject",
     navbarName: "Add Project Details"
+  },
+  {
+    redirect: true,
+    path: "/addconference",
+    to: "/addconference",
+    navbarName: "Conference Details"
+  },
+  {
+    redirect: true,
+    path: "/addjournal",
+    to: "/addjournal",
+    navbarName: "Journal Details"
   }
 ];
 

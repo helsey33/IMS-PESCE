@@ -41,6 +41,10 @@ module.exports = data => {
     errors.publishDate = "Publish Date required";
   }
 
+  if (!Validator.matches(data.publishDate, /^\d{2}\/\d{4}$/g)) {
+    errors.publishDate = "Format of the date is mm/yyyy";
+  }
+
   if (Validator.isEmpty(data.issnNo)) {
     errors.issnNo = "ISSN number required";
   }

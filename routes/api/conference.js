@@ -29,7 +29,7 @@ const uploadCert = multer({
     ) {
       cb(null, true);
     } else {
-      cb("Error : Only images allowed");
+      cb("Error : Only images or documents allowed");
     }
   }
 }).single("certificate");
@@ -51,17 +51,18 @@ const uploadPaper = multer({
 
 //@route POST conference/uploadCert : Private
 router.post(
-  "/uploadCert",
+  "/uploadCert/:id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     uploadCert(req, res, err => {
       if (err) res.status(400).json(err);
       else
-        Conference.findOne({ user: req.user.id }).then(conference => {
-          conference.certificate = req.file.path;
-          conference.save().then(conference => {
-            res.json(conference);
-          });
+        Conference.findOneAndUpdate(
+          { "conferenceData._id": req.params.id },
+          { $set: { "conferenceData.$.certificate": req.file.path } },
+          { new: true }
+        ).then(conference => {
+          res.json(conference);
         });
     });
   }
@@ -69,18 +70,33 @@ router.post(
 
 //@route POST conference/uploadPaper : Private
 router.post(
-  "/uploadPaper",
+  "/uploadPaper/:id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     uploadPaper(req, res, err => {
       if (err) res.status(400).json(err);
       else
-        Conference.findOne({ user: req.user.id }).then(conference => {
-          conference.paper = req.file.path;
-          conference.save().then(conference => {
-            res.json(conference);
-          });
+        Conference.findOneAndUpdate(
+          { "conferenceData._id": req.params.id },
+          { $set: { "conferenceData.$.paper": req.file.path } },
+          { new: true }
+        ).then(conference => {
+          res.json(conference);
         });
+    });
+  }
+);
+
+//@route GET confernece/downloadPaper : Private
+router.get(
+  "/downloadPaper/:cid",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Conference.findOne({ user: req.user.id }).then(conference => {
+      const cData = conference.conferenceData.find(
+        item => item.id === req.params.cid
+      );
+      res.download(cData.paper);
     });
   }
 );
@@ -95,29 +111,35 @@ router.post(
       return res.status(400).json(errors);
     }
 
-    const conferenceFields = {
+    const conferenceData = {
       cType: req.body.cType,
       paperTitle: req.body.paperTitle,
       conferenceTitle: req.body.conferenceTitle,
       organizedBy: req.body.organizedBy,
       isbnNo: req.body.isbnNo,
       publisher: req.body.publisher,
-      user: req.user.id,
-      authors: req.body.authors.split(",")
+      authors: req.body.authors
     };
     if (req.body.conferenceDate)
-      conferenceFields.conferenceDate = req.body.conferenceDate;
-    if (req.body.link) conferenceFields.link = req.body.link;
+      conferenceData.conferenceDate = req.body.conferenceDate;
+    if (req.body.link) conferenceData.link = req.body.link;
 
     Conference.findOne({ user: req.user.id }).then(conference => {
-      if (conference) {
-        Conference.findOneAndUpdate(
-          { user: req.user.id },
-          { $set: conferenceFields },
-          { new: true }
-        ).then(conference => res.json(conference));
+      if (!conference) {
+        conferenceField = {
+          user: req.user.id,
+          conferenceData
+        };
+        new Conference(conferenceField)
+          .save()
+          .then(conference => res.json(conference))
+          .catch(err => {
+            res.json("error from mongoose");
+            console.log(err);
+          });
       } else {
-        new Conference(conferenceFields)
+        conference.conferenceData.push(conferenceData);
+        conference
           .save()
           .then(conference => res.json(conference))
           .catch(err => {
@@ -170,5 +192,22 @@ router.get("/all", (req, res) => {
       res.status(400).send("Check error in console.");
     });
 });
+
+//@route DELETE /conference/:jid
+router.delete(
+  "/:cid",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Conference.findOne({ user: req.user.id })
+      .then(conference => {
+        const removeIndex = conference.conferenceData
+          .map(item => item.id)
+          .indexOf(req.params.jid);
+        conference.conferenceData.splice(removeIndex, 1);
+        conference.save().then(conference => res.json(conference));
+      })
+      .catch(err => res.status(400).res(err));
+  }
+);
 
 module.exports = router;

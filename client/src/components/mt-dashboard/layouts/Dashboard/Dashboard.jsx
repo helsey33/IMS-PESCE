@@ -25,6 +25,8 @@ import AddGraduation from "./../../views/UserProfile/AddGraduation";
 import AddPreGrad from "./../../views/UserProfile/AddPreGrad";
 import WorkExperience from "./../../views/UserProfile/WorkExperience";
 import AddProject from "./../../views/UserProfile/AddProject";
+import AddConference from "./../../views/C&J/AddConference";
+import AddJournal from "./../../views/C&J/AddJournal";
 
 const switchRoutes = (
   <Switch>
@@ -33,6 +35,8 @@ const switchRoutes = (
     <Route path="/addpregrad" component={AddPreGrad} />
     <Route path="/addworkexperience" component={WorkExperience} />
     <Route path="/addproject" component={AddProject} />
+    <Route path="/addconference" component={AddConference} />
+    <Route path="/addjournal" component={AddJournal} />
     {dashboardRoutes.map((prop, key) => {
       if (prop.redirect)
         return <Redirect from={prop.path} to={prop.to} key={key} />;

@@ -8,7 +8,7 @@ const ProfileSchema = new Schema({
   },
   displayImage: {
     type: String,
-    default: "uploads/displayImage/default-user-profile-picture-3.png"
+    default: "uploads/displayImage/default-user.png"
   },
   handle: {
     type: String,

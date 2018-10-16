@@ -41,7 +41,6 @@ app.use("/api/users", users);
 app.use("/api/profile", profile);
 app.use("/api/conference", conference);
 app.use("/api/journal", journal);
-
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
