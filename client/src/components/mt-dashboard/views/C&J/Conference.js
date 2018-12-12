@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import axios from "axios";
+import moment from "moment";
+import { DateRangePicker } from "react-dates";
+import "react-dates/initialize";
+import "react-dates/lib/css/_datepicker.css";
+import { CSVLink } from "react-csv";
 
 import {
   getConference,
@@ -45,10 +50,14 @@ class Conference extends Component {
     this.state = {
       searchBy: "paperTitle",
       conferenceSet: [],
-      open: false
+      open: false,
+      startDate: moment().startOf("month"),
+      endDate: moment().endOf("month"),
+      calenderFocused: null
     };
     this.searchByHandle = this.searchByHandle.bind(this);
     this.searchHandle = this.searchHandle.bind(this);
+    this.onDatePick = this.onDatePick.bind(this);
   }
   componentWillMount = () => {
     this.props.getConference();
@@ -107,12 +116,74 @@ class Conference extends Component {
     this.setState({
       conferenceSet: filteredSet
     });
+    console.log();
+  }
+
+  onDatePick({ startDate, endDate }) {
+    const filteredSet = this.props.conference.conference.conferenceData.filter(
+      data => {
+        return (
+          moment(data.conferenceDate).isSameOrAfter(startDate, "month") &&
+          moment(data.conferenceDate).isSameOrBefore(endDate, "month")
+        );
+      }
+    );
+    if (!startDate && !endDate) {
+      this.setState({
+        conferenceSet: this.props.conference.conference.conferenceData,
+        startDate,
+        endDate
+      });
+      return;
+    }
+    this.setState({
+      conferenceSet: filteredSet,
+      startDate,
+      endDate
+    });
   }
 
   render() {
     const { classes } = this.props;
     const { conference, loading } = this.props.conference;
     const { conferenceSet } = this.state;
+
+    //For exporting CSV
+    const headers = [
+      { label: "Conference Type", key: "cType" },
+      { label: "Paper Title", key: "paperTitle" },
+      { label: "Conference Title", key: "conferenceTitle" },
+      { label: "Organized By", key: "organizedBy" },
+      { label: "ISBN No", key: "isbnNo" },
+      { label: "Publisher", key: "publisher" },
+      { label: "Authors", key: "authors" },
+      { label: "Conference Date", key: "conferenceDate" }
+    ];
+
+    const data = this.state.conferenceSet.map(data => ({
+      cType: data.cType,
+      paperTitle: data.paperTitle,
+      conferenceTitle: data.conferenceTitle,
+      organizedBy: data.organizedBy,
+      isbnNo: data.isbnNo,
+      publisher: data.publisher,
+      authors: data.authors,
+      conferenceDate: moment(data.conferenceDate).format("MMM YYYY")
+    }));
+
+    data.unshift({
+      cType: "",
+      paperTitle: "",
+      conferenceTitle: "",
+      organizedBy: "",
+      isbnNo: "",
+      publisher: "",
+      authors: "",
+      conferenceDate: ""
+    });
+
+    // data unshift to add a blank row
+
     let conferenceContent;
     if (conference === null || loading) {
       conferenceContent = (
@@ -147,7 +218,7 @@ class Conference extends Component {
                   />
                 </GridItem>
                 <GridItem>
-                  <FormControl style={{ width: "400%" }}>
+                  <FormControl style={{ width: "100%" }}>
                     <InputLabel html-for="searchBy">Search By</InputLabel>
                     <Select
                       className={classes.cTypeStyle}
@@ -168,35 +239,69 @@ class Conference extends Component {
                       <MenuItem value="conferenceDate">Date</MenuItem>
                       <MenuItem value="isbnNo">ISBN No</MenuItem>
                       <MenuItem value="publisher">Publisher</MenuItem>
+                      <MenuItem value="academicYear">Academic Year</MenuItem>
                     </Select>
                   </FormControl>
                 </GridItem>
+                <GridItem>
+                  <DateRangePicker
+                    startDate={this.state.startDate}
+                    endDate={this.state.endDate}
+                    onDatesChange={this.onDatePick}
+                    focusedInput={this.state.calenderFocused}
+                    onFocusChange={calenderFocused =>
+                      this.setState({ calenderFocused })
+                    }
+                    numberOfMonths={1}
+                    isOutsideRange={() => false}
+                    showClearDates={true}
+                    startDateId={moment().toString()}
+                    endDateId={moment()
+                      .endOf("month")
+                      .toString()}
+                  />
+                </GridItem>
+                <GridItem>
+                  <CSVLink
+                    data={data}
+                    headers={headers}
+                    filename={"conference_report.csv"}
+                  >
+                    <Button
+                      variant="outlined"
+                      style={{ lineHeight: "2em" }}
+                      color="primary"
+                    >
+                      CSV
+                    </Button>
+                  </CSVLink>
+                </GridItem>
               </GridContainer>
               {conferenceSet.map(data => (
-                <Card>
+                <Card key={data._id}>
                   <CardBody>
                     <div>
                       <GridContainer>
-                        <GridItem md={1.5} sm={1.5}>
+                        <GridItem>
                           <p className={classes.title}>Conference Type :</p>
                         </GridItem>
-                        <GridItem md={2.5} sm={2.5}>
+                        <GridItem>
                           <p>{data.cType}</p>
                         </GridItem>
-                        <GridItem md={2.5} sm={2.5}>
+                        <GridItem>
                           <p className={classes.title}>Conference Title :</p>
                         </GridItem>
-                        <GridItem md={8.5} sm={8.5}>
+                        <GridItem>
                           <p>{data.conferenceTitle}</p>
                         </GridItem>
                       </GridContainer>
                     </div>
                     <div>
                       <GridContainer>
-                        <GridItem md={1.5} sm={1.5}>
+                        <GridItem>
                           <p className={classes.title}>Paper Title :</p>
                         </GridItem>
-                        <GridItem md={5.5} sm={5.5}>
+                        <GridItem>
                           <p>{data.paperTitle}</p>
                         </GridItem>
                       </GridContainer>
@@ -237,7 +342,7 @@ class Conference extends Component {
                         <GridItem md={3} sm={3}>
                           <p>
                             <span className={classes.title}>Date : </span>
-                            {data.conferenceDate}
+                            {moment(data.conferenceDate).format("MMM YYYY")}
                           </p>
                         </GridItem>
                       </GridContainer>
@@ -278,7 +383,7 @@ class Conference extends Component {
                               style={{ cursor: "pointer" }}
                             >
                               <Tooltip
-                                title="Make sure you upload the correct file"
+                                title="Only pdf or word file allowed"
                                 placement="bottom"
                               >
                                 <Button
@@ -328,7 +433,7 @@ class Conference extends Component {
                             />
                             <label htmlFor="cert" style={{ cursor: "pointer" }}>
                               <Tooltip
-                                title="Make sure you upload the correct file"
+                                title="Only images allowed (jpeg | jpg | png)"
                                 placement="bottom"
                               >
                                 <Button

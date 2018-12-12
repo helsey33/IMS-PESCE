@@ -3,6 +3,7 @@ import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
 import Forum from "@material-ui/icons/Forum";
 import ChromeReaderMode from "@material-ui/icons/ChromeReaderMode";
+import VerifiedUser from "@material-ui/icons/VerifiedUser";
 // import ContentPaste from "@material-ui/icons/ContentPaste";
 // import LibraryBooks from "@material-ui/icons/LibraryBooks";
 // import BubbleChart from "@material-ui/icons/BubbleChart";
@@ -14,6 +15,7 @@ import DashboardPage from "../views/Dashboard/Dashboard.jsx";
 import UserProfile from "../views/UserProfile/UserProfile.jsx";
 import Conference from "../views/C&J/Conference";
 import Journal from "../views/C&J/Journal";
+import AdminArea from "../views/AdminArea/AdminArea";
 
 const dashboardRoutes = [
   {
@@ -44,13 +46,13 @@ const dashboardRoutes = [
     icon: ChromeReaderMode,
     component: Journal
   },
-  // {
-  //   path: "/icons",
-  //   sidebarName: "Icons",
-  //   navbarName: "Icons",
-  //   icon: BubbleChart,
-  //   component: Icons
-  // },
+  {
+    path: "/adminarea",
+    sidebarName: "Admin Panel",
+    navbarName: "AdminArea",
+    icon: VerifiedUser,
+    component: AdminArea
+  },
   // {
   //   path: "/maps",
   //   sidebarName: "Maps",

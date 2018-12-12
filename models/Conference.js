@@ -29,7 +29,7 @@ const ConferenceSchema = new Schema({
         required: true
       },
       conferenceDate: {
-        type: String
+        type: Date
       },
       isbnNo: {
         type: String,
@@ -47,6 +47,10 @@ const ConferenceSchema = new Schema({
       },
       paper: {
         type: String
+      },
+      academicYear: {
+        type: String,
+        required: true
       }
     }
   ]

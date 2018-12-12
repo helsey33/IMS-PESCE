@@ -37,7 +37,7 @@ const JournalSchema = new Schema({
         required: true
       },
       publishDate: {
-        type: String,
+        type: Date,
         required: true
       },
       issnNo: {
@@ -67,6 +67,10 @@ const JournalSchema = new Schema({
       },
       paper: {
         type: String
+      },
+      academicYear: {
+        type: String
+        // required: true
       }
     }
   ]

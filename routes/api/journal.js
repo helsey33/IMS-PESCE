@@ -1,4 +1,5 @@
 const express = require("express");
+const moment = require("moment");
 const router = express.Router();
 const passport = require("passport");
 const multer = require("multer");
@@ -78,6 +79,8 @@ router.post(
       return res.status(400).json(errors);
     }
 
+    const date = moment(req.body.publishDate, "MM/YYYY");
+
     const journalData = {
       jType: req.body.jType,
       paperTitle: req.body.paperTitle,
@@ -85,15 +88,18 @@ router.post(
       volume: req.body.volume,
       issue: req.body.issue,
       pageNos: req.body.pageNos,
-      publishDate: req.body.publishDate,
+      publishDate: moment(req.body.publishDate, "MM/YYYY"),
       issnNo: req.body.issnNo,
       ugcApproved: req.body.ugcApproved,
       authors: req.body.authors,
-      indexedBy: req.body.indexedBy
+      indexedBy: req.body.indexedBy,
+      academicYear:
+        date.month() >= 7
+          ? `${date.year()}-${date.add(1, "year").year()}`
+          : `${date.subtract(1, "year").year()}-${date.add(1, "year").year()}`
     };
     if (req.body.publisher) journalData.publisher = req.body.publisher;
     if (req.body.onlineLink) journalData.onlineLink = req.body.onlineLink;
-    //TODO : indexed By
     journalData.indexedBy = req.body.indexedBy;
     Journal.findOne({ user: req.user.id }).then(journal => {
       if (!journal) {

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const multer = require("multer");
+const moment = require("moment");
 
 //Mongoose models
 const Conference = require("./../../models/Conference");
@@ -29,7 +30,7 @@ const uploadCert = multer({
     ) {
       cb(null, true);
     } else {
-      cb("Error : Only images or documents allowed");
+      cb("Error : Only images  allowed");
     }
   }
 }).single("certificate");
@@ -111,6 +112,8 @@ router.post(
       return res.status(400).json(errors);
     }
 
+    const date = moment(req.body.conferenceDate, "MM/YYYY");
+
     const conferenceData = {
       cType: req.body.cType,
       paperTitle: req.body.paperTitle,
@@ -118,10 +121,13 @@ router.post(
       organizedBy: req.body.organizedBy,
       isbnNo: req.body.isbnNo,
       publisher: req.body.publisher,
-      authors: req.body.authors
+      authors: req.body.authors,
+      conferenceDate: moment(req.body.conferenceDate, "MM/YYYY"),
+      academicYear:
+        date.month() >= 7
+          ? `${date.year()}-${date.add(1, "year").year()}`
+          : `${date.subtract(1, "year").year()}-${date.add(1, "year").year()}`
     };
-    if (req.body.conferenceDate)
-      conferenceData.conferenceDate = req.body.conferenceDate;
     if (req.body.link) conferenceData.link = req.body.link;
 
     Conference.findOne({ user: req.user.id }).then(conference => {

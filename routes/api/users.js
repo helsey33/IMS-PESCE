@@ -10,8 +10,6 @@ const validateLogin = require("./../../validation/login");
 //Import models
 const User = require("../../models/User");
 
-router.get("/", (req, res) => res.json({ msg: "user works" }));
-
 //@routes POST /register
 router.post("/register", (req, res) => {
   const { errors, isValid } = validateRegister(req.body);
@@ -27,7 +25,8 @@ router.post("/register", (req, res) => {
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      admin: req.body.admin
     });
 
     bcrypt.genSalt(10, (err, salt) => {
@@ -37,7 +36,7 @@ router.post("/register", (req, res) => {
         newUser
           .save()
           .then(user => {
-            const payload = { id: user.id, name: user.name };
+            const payload = { id: user.id, name: user.name, admin: user.admin };
             jwt.sign(
               payload,
               keys.secret,
@@ -75,7 +74,7 @@ router.post("/login", (req, res) => {
       .compare(password, user.password)
       .then(isMatch => {
         if (isMatch) {
-          const payload = { id: user.id, name: user.name };
+          const payload = { id: user.id, name: user.name, admin: user.admin };
           jwt.sign(
             payload,
             keys.secret,
