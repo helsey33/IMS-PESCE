@@ -8,10 +8,7 @@ import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
 import { CSVLink } from "react-csv";
 
-import {
-  getJournal,
-  deleteJournalDetail
-} from "../../../../actions/journalActions";
+import { getJournalAll } from "../../../../actions/journalActions";
 import Card from "../../components/Card/Card";
 import CardBody from "../../components/Card/CardBody";
 import GridItem from "../../components/Grid/GridItem.jsx";
@@ -41,12 +38,13 @@ const styles = {
   }
 };
 
-class Journal extends Component {
+class AllJournal extends Component {
   constructor(props) {
     super(props);
     this.state = {
       searchBy: "paperTitle",
       journalSet: [],
+      journals: [],
       startDate: moment().startOf("month"),
       endDate: moment().endOf("month"),
       calenderFocused: null
@@ -56,11 +54,7 @@ class Journal extends Component {
     this.onDatePick = this.onDatePick.bind(this);
   }
   componentWillMount = () => {
-    this.props.getJournal();
-  };
-
-  deleteJournalDetails = id => {
-    this.props.deleteJournalDetail(id);
+    this.props.getJournalAll();
   };
 
   onPaperUpload = (id, e) => {
@@ -85,10 +79,15 @@ class Journal extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.journal.journal) {
-      console.log(newProps.journal.journal);
+    const { journals } = newProps.journal;
+    if (journals) {
+      let journalSet = [];
+      journals.forEach(data => {
+        journalSet.push(...data.journalData);
+      });
       this.setState({
-        journalSet: newProps.journal.journal.journalData
+        journalSet,
+        journals: journalSet
       });
     }
   }
@@ -96,7 +95,7 @@ class Journal extends Component {
   searchHandle(e) {
     const searchTerm = e.target.value;
     const filter = this.state.searchBy;
-    const filteredSet = this.props.journal.journal.journalData.filter(data => {
+    const filteredSet = this.state.journals.filter(data => {
       return data[filter].toLowerCase().includes(searchTerm.toLowerCase());
     });
 
@@ -106,7 +105,7 @@ class Journal extends Component {
   }
 
   onDatePick({ startDate, endDate }) {
-    const filteredSet = this.props.journal.journal.journalData.filter(data => {
+    const filteredSet = this.state.journals.filter(data => {
       return (
         moment(data.publishDate).isSameOrAfter(startDate, "month") &&
         moment(data.publishDate).isSameOrBefore(endDate, "month")
@@ -114,7 +113,7 @@ class Journal extends Component {
     });
     if (!startDate && !endDate) {
       this.setState({
-        journalSet: this.props.journal.journal.journalData,
+        journalSet: this.state.journals,
         startDate,
         endDate
       });
@@ -129,17 +128,17 @@ class Journal extends Component {
 
   render() {
     const { classes } = this.props;
-    const { journal, loading } = this.props.journal;
+    const { journals, loading } = this.props.journal;
     const { journalSet } = this.state;
 
     let journalContent;
-    if (journal === null || loading) {
+    if (journals === null || loading) {
       journalContent = (
         <div className={classes.spinner}>
           <CircularProgress size={50} />
         </div>
       );
-    } else if (Object.keys(journal).length > 0) {
+    } else if (Object.keys(journals).length > 0) {
       //For exporting CSV
       const headers = [
         { label: "Journal Type", key: "jType" },
@@ -445,20 +444,6 @@ class Journal extends Component {
                             </p>
                           </GridItem>
                         )}
-                        <GridItem md={3} sm={3}>
-                          <p>
-                            <Button
-                              variant="outlined"
-                              color="secondary"
-                              onClick={this.deleteJournalDetails.bind(
-                                this,
-                                data._id
-                              )}
-                            >
-                              Delete Details
-                            </Button>
-                          </p>
-                        </GridItem>
                         <GridItem md={1} />
                       </GridContainer>
                     </div>
@@ -474,12 +459,7 @@ class Journal extends Component {
         <GridContainer>
           <GridItem md={8}>
             <div>
-              <h4 className={classes.cardTitle}>
-                You haven't yet set up any journal details.
-              </h4>
-              <Link to="/addjournal" className={classes.cardLink}>
-                Add details
-              </Link>
+              <h4 className={classes.cardTitle}>No journals found.</h4>
             </div>
           </GridItem>
         </GridContainer>
@@ -497,6 +477,6 @@ const mapStateToProps = state => ({
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { getJournal, deleteJournalDetail }
-  )(Journal)
+    { getJournalAll }
+  )(AllJournal)
 );

@@ -1,0 +1,53 @@
+.outer_box {
+  width: 100%;
+  height: 250px;
+  border-radius: 5px;
+  margin: 20px 0;
+  overflow: hidden;
+  .overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    header {
+      color: #fff;
+      position: relative;
+      top: 50px;
+      left: 50px;
+      font-size: 55px;
+    }
+  }
+}
+
+.profile {
+  background: url("profile.jpg") no-repeat center center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  transition: all 0.5s;
+  &:hover {
+    transform: scale(1.01);
+  }
+}
+
+.conference {
+  background: url("conference.jpg") no-repeat center center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  transition: all 0.5s;
+  &:hover {
+    transform: scale(1.01);
+  }
+}
+
+.journal {
+  background: url("journal.jpg") no-repeat center center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  transition: all 0.5s;
+  &:hover {
+    transform: scale(1.01);
+  }
+}

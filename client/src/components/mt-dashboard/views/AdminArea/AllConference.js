@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import axios from "axios";
@@ -9,10 +9,11 @@ import "react-dates/lib/css/_datepicker.css";
 import { CSVLink } from "react-csv";
 
 import {
-  getJournal,
-  deleteJournalDetail
-} from "../../../../actions/journalActions";
+  getConferenceAll,
+  deleteConferenceDetail
+} from "../../../../actions/conferenceActions";
 import Card from "../../components/Card/Card";
+// import CardHeader from "../../components/Card/CardHeader";
 import CardBody from "../../components/Card/CardBody";
 import GridItem from "../../components/Grid/GridItem.jsx";
 import GridContainer from "../../components/Grid/GridContainer.jsx";
@@ -25,7 +26,9 @@ import {
   Select,
   InputLabel,
   FormControl,
-  MenuItem
+  MenuItem,
+  Dialog,
+  DialogContent
 } from "@material-ui/core";
 
 const styles = {
@@ -41,12 +44,14 @@ const styles = {
   }
 };
 
-class Journal extends Component {
+class Conference extends Component {
   constructor(props) {
     super(props);
     this.state = {
       searchBy: "paperTitle",
-      journalSet: [],
+      conferenceSet: [],
+      conferences: [],
+      open: false,
       startDate: moment().startOf("month"),
       endDate: moment().endOf("month"),
       calenderFocused: null
@@ -56,18 +61,18 @@ class Journal extends Component {
     this.onDatePick = this.onDatePick.bind(this);
   }
   componentWillMount = () => {
-    this.props.getJournal();
+    this.props.getConferenceAll();
   };
 
-  deleteJournalDetails = id => {
-    this.props.deleteJournalDetail(id);
+  deleteConferenceDetails = id => {
+    this.props.deleteConferenceDetail(id);
   };
 
   onPaperUpload = (id, e) => {
     const fd = new FormData();
     fd.append("paper", e.target.files[0], e.target.files[0].name);
     axios
-      .post(`/api/journal/uploadPaper/${id}`, fd)
+      .post(`/api/conference/uploadPaper/${id}`, fd)
       .then(res => {
         window.location.reload();
       })
@@ -75,20 +80,34 @@ class Journal extends Component {
   };
 
   downloadPaper(id) {
-    axios
-      .get(`/api/journal/downloadPaper/${id}`)
-      .then(res => console.log("success"));
+    axios.get(`/api/conference/downloadPaper/${id}`).then(res => {});
   }
+
+  onCertUpload = (id, e) => {
+    const fd = new FormData();
+    fd.append("certificate", e.target.files[0], e.target.files[0].name);
+    axios
+      .post(`/api/conference/uploadCert/${id}`, fd)
+      .then(res => {
+        window.location.reload();
+      })
+      .catch(err => console.log(err));
+  };
 
   searchByHandle(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.journal.journal) {
-      console.log(newProps.journal.journal);
+    const { conferences } = newProps.conference;
+    if (conferences) {
+      let conferenceSet = [];
+      conferences.forEach(data => {
+        conferenceSet.push(...data.conferenceData);
+      });
       this.setState({
-        journalSet: newProps.journal.journal.journalData
+        conferenceSet,
+        conferences: conferenceSet
       });
     }
   }
@@ -96,32 +115,31 @@ class Journal extends Component {
   searchHandle(e) {
     const searchTerm = e.target.value;
     const filter = this.state.searchBy;
-    const filteredSet = this.props.journal.journal.journalData.filter(data => {
+    const filteredSet = this.state.conferences.filter(data => {
       return data[filter].toLowerCase().includes(searchTerm.toLowerCase());
     });
-
     this.setState({
-      journalSet: filteredSet
+      conferenceSet: filteredSet
     });
   }
 
   onDatePick({ startDate, endDate }) {
-    const filteredSet = this.props.journal.journal.journalData.filter(data => {
+    const filteredSet = this.state.conferences.filter(data => {
       return (
-        moment(data.publishDate).isSameOrAfter(startDate, "month") &&
-        moment(data.publishDate).isSameOrBefore(endDate, "month")
+        moment(data.conferenceDate).isSameOrAfter(startDate, "month") &&
+        moment(data.conferenceDate).isSameOrBefore(endDate, "month")
       );
     });
     if (!startDate && !endDate) {
       this.setState({
-        journalSet: this.props.journal.journal.journalData,
+        conferenceSet: this.state.conferences,
         startDate,
         endDate
       });
       return;
     }
     this.setState({
-      journalSet: filteredSet,
+      conferenceSet: filteredSet,
       startDate,
       endDate
     });
@@ -129,74 +147,66 @@ class Journal extends Component {
 
   render() {
     const { classes } = this.props;
-    const { journal, loading } = this.props.journal;
-    const { journalSet } = this.state;
+    const { conferences, loading } = this.props.conference;
+    const { conferenceSet } = this.state;
 
-    let journalContent;
-    if (journal === null || loading) {
-      journalContent = (
+    let conferenceContent;
+    if (conferences === null || loading) {
+      conferenceContent = (
         <div className={classes.spinner}>
           <CircularProgress size={50} />
         </div>
       );
-    } else if (Object.keys(journal).length > 0) {
+    } else if (Object.keys(conferences).length > 0) {
       //For exporting CSV
       const headers = [
-        { label: "Journal Type", key: "jType" },
+        { label: "Conference Type", key: "cType" },
         { label: "Paper Title", key: "paperTitle" },
-        { label: "Journal Title", key: "jTitle" },
-        { label: "Authors", key: "authors" },
-        { label: "Volume", key: "volume" },
-        { label: "Issue", key: "issue" },
+        { label: "Conference Title", key: "conferenceTitle" },
+        { label: "Organized By", key: "organizedBy" },
+        { label: "ISBN No", key: "isbnNo" },
         { label: "Publisher", key: "publisher" },
-        { label: "Page Numbers", key: "pageNos" },
-        { label: "Publish Date", key: "publishDate" },
-        { label: "ISSN No", key: "issnNo" },
-        { label: "UGC Approved", key: "ugcApproved" }
+        { label: "Authors", key: "authors" },
+        { label: "Conference Date", key: "conferenceDate" }
       ];
 
-      const data = this.state.journalSet.map(data => ({
-        jType: data.jType,
+      const data = this.state.conferenceSet.map(data => ({
+        cType: data.cType,
         paperTitle: data.paperTitle,
-        jTitle: data.jTitle,
-        authors: data.authors,
-        volume: data.volume,
-        issue: data.issue,
+        conferenceTitle: data.conferenceTitle,
+        organizedBy: data.organizedBy,
+        isbnNo: data.isbnNo,
         publisher: data.publisher,
-        pageNos: data.pageNos,
-        publishDate: moment(data.publishDate).format("MMM YYYY"),
-        issnNo: data.issnNo,
-        ugcApproved: data.ugcApproved
+        authors: data.authors,
+        conferenceDate: moment(data.conferenceDate).format("MMM YYYY")
       }));
 
       data.unshift({
-        jType: "",
+        cType: "",
         paperTitle: "",
-        journalTitle: "",
-        authors: "",
-        volume: "",
-        issue: "",
+        conferenceTitle: "",
+        organizedBy: "",
+        isbnNo: "",
         publisher: "",
-        pageNos: "",
-        publishDate: "",
-        issnNo: "",
-        ugcApproved: ""
+        authors: "",
+        conferenceDate: ""
       });
 
       // data unshift to add a blank row
-      journalContent = (
+
+      conferenceContent = (
         <div>
           <GridContainer>
             <GridItem md={12} sm={12}>
               <GridContainer>
                 <GridItem>
-                  <Link to="/addjournal">
+                  <Link to="/addconference">
                     <Button
                       variant="contained"
                       color="primary"
                       style={{ lineHeight: "2.4em" }}
                     >
-                      Add Journal
+                      Add Conference
                     </Button>
                   </Link>
                 </GridItem>
@@ -222,11 +232,14 @@ class Journal extends Component {
                         id: "searchBy"
                       }}
                     >
-                      <MenuItem value="jType">Journal Type</MenuItem>
+                      <MenuItem value="cType">Conference Type</MenuItem>
                       <MenuItem value="paperTitle">Paper Title</MenuItem>
                       <MenuItem value="authors">Authors</MenuItem>
-                      <MenuItem value="jTitle">Journal Title</MenuItem>
-                      <MenuItem value="issnNo">ISSN No</MenuItem>
+                      <MenuItem value="conferenceTitle">
+                        Conference Title
+                      </MenuItem>
+                      <MenuItem value="conferenceDate">Date</MenuItem>
+                      <MenuItem value="isbnNo">ISBN No</MenuItem>
                       <MenuItem value="publisher">Publisher</MenuItem>
                       <MenuItem value="academicYear">Academic Year</MenuItem>
                     </Select>
@@ -254,7 +267,7 @@ class Journal extends Component {
                   <CSVLink
                     data={data}
                     headers={headers}
-                    filename={"journal_report.csv"}
+                    filename={"conference_report.csv"}
                   >
                     <Button
                       variant="outlined"
@@ -266,87 +279,50 @@ class Journal extends Component {
                   </CSVLink>
                 </GridItem>
               </GridContainer>
-              {journalSet.map(data => (
+              {conferenceSet.map(data => (
                 <Card key={data._id}>
                   <CardBody>
                     <div>
                       <GridContainer>
                         <GridItem>
-                          <p className={classes.title}>Journal Type :</p>
+                          <p className={classes.title}>Conference Type :</p>
                         </GridItem>
                         <GridItem>
-                          <p>{data.jType}</p>
+                          <p>{data.cType}</p>
                         </GridItem>
                         <GridItem>
-                          <p className={classes.title}>Journal Title :</p>
+                          <p className={classes.title}>Conference Title :</p>
                         </GridItem>
                         <GridItem>
-                          <p>{data.jTitle}</p>
+                          <p>{data.conferenceTitle}</p>
                         </GridItem>
                       </GridContainer>
                     </div>
                     <div>
                       <GridContainer>
-                        <GridItem md={2} sm={2}>
+                        <GridItem>
                           <p className={classes.title}>Paper Title :</p>
                         </GridItem>
-                        <GridItem md={10} sm={10}>
+                        <GridItem>
                           <p>{data.paperTitle}</p>
                         </GridItem>
                       </GridContainer>
                     </div>
                     <div>
                       <GridContainer>
-                        <GridItem md={2} sm={2}>
-                          <p className={classes.title}>Authors :</p>
-                        </GridItem>
-                        <GridItem md={10} sm={10}>
-                          <p>{data.authors}</p>
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                    <div>
-                      <GridContainer>
-                        <GridItem md={2} sm={2}>
-                          <p className={classes.title}>Publisher :</p>
-                        </GridItem>
-                        <GridItem md={4} sm={4}>
-                          <p>{data.publisher}</p>
+                        <GridItem md={6} sm={6}>
+                          <p>
+                            <span className={classes.title}>Authors :</span>{" "}
+                            {data.authors}
+                          </p>
                         </GridItem>
                         <GridItem md={6} sm={6}>
                           <p>
-                            <span className={classes.title}>ISSN Number :</span>
-                            {data.issnNo}
-                          </p>
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                    <div>
-                      <GridContainer>
-                        {(data.indexedBy.webOfScience ||
-                          data.indexedBy.scopus ||
-                          data.indexedBy.indianCitationIndex) && (
-                          <Fragment>
-                            <GridItem md={2} sm={2}>
-                              <p className={classes.title}>Indexed By : </p>
-                            </GridItem>
-                            <GridItem md={6} sm={6}>
-                              <p>
-                                {data.indexedBy.webOfScience &&
-                                  "Web Of Science, "}
-                                {data.indexedBy.scopus && "Scopus, "}{" "}
-                                {data.indexedBy.indianCitationIndex &&
-                                  "Indian Citation Index"}
-                              </p>
-                            </GridItem>
-                          </Fragment>
-                        )}
-                        <GridItem md={4} sm={4}>
-                          <p>
                             <span className={classes.title}>
-                              UGC Approved :
+                              {" "}
+                              Organized By :{" "}
                             </span>
-                            {data.ugcApproved}
+                            {data.organizedBy}
                           </p>
                         </GridItem>
                       </GridContainer>
@@ -355,49 +331,34 @@ class Journal extends Component {
                       <GridContainer>
                         <GridItem md={3} sm={3}>
                           <p>
-                            {" "}
-                            <span className={classes.title}>Voulme : </span>
-                            {data.volume}
+                            <span className={classes.title}>Publisher : </span>{" "}
+                            {data.publisher}
                           </p>
                         </GridItem>
                         <GridItem md={3} sm={3}>
                           <p>
-                            <span className={classes.title}>Issue : </span>
-                            {data.issue}
+                            <span className={classes.title}>ISBN Number :</span>
+                            {data.isbnNo}
                           </p>
                         </GridItem>
                         <GridItem md={3} sm={3}>
                           <p>
-                            {" "}
-                            <span className={classes.title}>
-                              Page Numbers :{" "}
-                            </span>
-                            {data.pageNos}
-                          </p>
-                        </GridItem>
-                        <GridItem md={3} sm={3}>
-                          <p>
-                            <span className={classes.title}>
-                              Published Date :
-                            </span>
-                            {moment(data.publishDate).format("MMM YYYY")}
+                            <span className={classes.title}>Date : </span>
+                            {moment(data.conferenceDate).format("MMM YYYY")}
                           </p>
                         </GridItem>
                       </GridContainer>
                     </div>
                     <div style={{ marginTop: 10 }}>
                       <GridContainer>
-                        <GridItem md={2} />
                         <GridItem md={3} sm={3}>
-                          <p>
-                            {data.onlineLink && (
-                              <a href={data.onlineLink} target="_blank">
-                                <Button variant="outlined" color="primary">
-                                  Online Link
-                                </Button>
-                              </a>
-                            )}
-                          </p>
+                          {data.link && (
+                            <a href={data.link} target="_blank">
+                              <Button variant="outlined" color="primary">
+                                Online Link
+                              </Button>
+                            </a>
+                          )}
                         </GridItem>
                         {data.paper ? (
                           <GridItem md={3} sm={3}>
@@ -411,55 +372,97 @@ class Journal extends Component {
                           </GridItem>
                         ) : (
                           <GridItem md={3} sm={3}>
-                            <p>
-                              <input
-                                accept="application/pdf,application/vnd.ms-excel"
-                                className={classes.input}
-                                style={{ display: "none" }}
-                                id="paper"
-                                type="file"
-                                onChange={this.onPaperUpload.bind(
-                                  this,
-                                  data._id
-                                )}
-                              />
-                              <label
-                                htmlFor="paper"
-                                style={{ cursor: "pointer" }}
+                            <input
+                              accept="application/pdf,application/vnd.ms-excel"
+                              className={classes.input}
+                              style={{ display: "none" }}
+                              id="paper"
+                              type="file"
+                              onChange={this.onPaperUpload.bind(this, data._id)}
+                            />
+                            <label
+                              htmlFor="paper"
+                              style={{ cursor: "pointer" }}
+                            >
+                              <Tooltip
+                                title="Only pdf or word file allowed"
+                                placement="bottom"
                               >
-                                <Tooltip
-                                  title="Make sure you upload the correct file"
-                                  placement="bottom"
+                                <Button
+                                  variant="outlined"
+                                  color="primary"
+                                  onClick={() => {
+                                    document.getElementById("paper").click();
+                                  }}
                                 >
-                                  <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    onClick={() => {
-                                      document.getElementById("paper").click();
-                                    }}
-                                  >
-                                    Upload Paper
-                                  </Button>
-                                </Tooltip>
-                              </label>
-                            </p>
+                                  Upload Paper
+                                </Button>
+                              </Tooltip>
+                            </label>
+                          </GridItem>
+                        )}
+                        {data.certificate ? (
+                          <GridItem md={3} sm={3}>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              onClick={() => this.setState({ open: true })}
+                            >
+                              View Certificate
+                            </Button>
+                            <Dialog
+                              onClose={() => this.setState({ open: false })}
+                              open={this.state.open}
+                            >
+                              <DialogContent>
+                                <img
+                                  style={{ width: "100%", height: "auto" }}
+                                  src={data.certificate}
+                                  alt="Certificate_not_found"
+                                />
+                              </DialogContent>
+                            </Dialog>
+                          </GridItem>
+                        ) : (
+                          <GridItem md={3} sm={3}>
+                            <input
+                              accept="image/*"
+                              className={classes.input}
+                              style={{ display: "none" }}
+                              id="cert"
+                              type="file"
+                              onChange={this.onCertUpload.bind(this, data._id)}
+                            />
+                            <label htmlFor="cert" style={{ cursor: "pointer" }}>
+                              <Tooltip
+                                title="Only images allowed (jpeg | jpg | png)"
+                                placement="bottom"
+                              >
+                                <Button
+                                  variant="outlined"
+                                  color="primary"
+                                  onClick={() => {
+                                    document.getElementById("cert").click();
+                                  }}
+                                >
+                                  Upload Certificate
+                                </Button>
+                              </Tooltip>
+                            </label>
                           </GridItem>
                         )}
                         <GridItem md={3} sm={3}>
-                          <p>
-                            <Button
-                              variant="outlined"
-                              color="secondary"
-                              onClick={this.deleteJournalDetails.bind(
-                                this,
-                                data._id
-                              )}
-                            >
-                              Delete Details
-                            </Button>
-                          </p>
+                          <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={this.deleteConferenceDetails.bind(
+                              this,
+                              data._id
+                            )}
+                          >
+                            Delete Details
+                          </Button>
                         </GridItem>
-                        <GridItem md={1} />
                       </GridContainer>
                     </div>
                   </CardBody>
@@ -470,14 +473,14 @@ class Journal extends Component {
         </div>
       );
     } else {
-      journalContent = (
+      conferenceContent = (
         <GridContainer>
           <GridItem md={8}>
             <div>
               <h4 className={classes.cardTitle}>
-                You haven't yet set up any journal details.
+                You haven't yet set up any conference details.
               </h4>
-              <Link to="/addjournal" className={classes.cardLink}>
+              <Link to="/addconference" className={classes.cardLink}>
                 Add details
               </Link>
             </div>
@@ -486,17 +489,17 @@ class Journal extends Component {
       );
     }
 
-    return <div>{journalContent}</div>;
+    return <div>{conferenceContent}</div>;
   }
 }
 
 const mapStateToProps = state => ({
-  journal: state.journal
+  conference: state.conference
 });
 
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { getJournal, deleteJournalDetail }
-  )(Journal)
+    { getConferenceAll, deleteConferenceDetail }
+  )(Conference)
 );

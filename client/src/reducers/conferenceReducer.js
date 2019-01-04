@@ -10,6 +10,8 @@ export default (state = initialState, action) => {
       return { ...state, conference: action.payload, loading: false };
     case "PAGE_LOADING":
       return { ...state, loading: true };
+    case "GET_CONFERENCE_ALL":
+      return { ...state, conferences: action.payload, loading: false };
     default:
       return state;
   }

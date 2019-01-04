@@ -26,6 +26,10 @@ import WorkExperience from "./../../views/UserProfile/WorkExperience";
 import AddProject from "./../../views/UserProfile/AddProject";
 import AddConference from "./../../views/C&J/AddConference";
 import AddJournal from "./../../views/C&J/AddJournal";
+import AllConference from "./../../views/AdminArea/AllConference";
+import AllJournal from "./../../views/AdminArea/AllJournal";
+import AllPRofiles from "./../../views/AdminArea/AllProfiles";
+import ProfileByHandle from "./../../views/AdminArea/ProfileByHandle";
 
 const switchRoutes = (
   <Switch>
@@ -36,6 +40,10 @@ const switchRoutes = (
     <Route path="/addproject" component={AddProject} />
     <Route path="/addconference" component={AddConference} />
     <Route path="/addjournal" component={AddJournal} />
+    <Route path="/allconference" component={AllConference} />
+    <Route path="/alljournal" component={AllJournal} />
+    <Route path="/allprofiles" component={AllPRofiles} />
+    <Route path="/handle/:handle" component={ProfileByHandle} />
     {dashboardRoutes.map((prop, key) => {
       if (prop.redirect)
         return <Redirect from={prop.path} to={prop.to} key={key} />;

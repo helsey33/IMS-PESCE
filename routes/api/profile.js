@@ -156,7 +156,12 @@ router.post(
           { user: req.user.id },
           { $set: profileFields },
           { new: true }
-        ).then(profile => res.json(profile));
+        )
+          .then(profile => res.json(profile))
+          .catch(err => {
+            res.json("error from mongoose");
+            console.log(err);
+          });
       } else {
         new Profile(profileFields)
           .save()

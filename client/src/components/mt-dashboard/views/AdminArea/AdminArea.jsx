@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+
+import "./adminStyle.scss";
 
 class AdminArea extends Component {
   componentWillMount = () => {
@@ -11,7 +14,33 @@ class AdminArea extends Component {
   render() {
     return (
       <div>
-        <h1>Admin Area</h1>
+        <Link to="allprofiles">
+          <div className=" outer_box">
+            <div className="profile">
+              <div className="overlay">
+                <header>Profiles</header>
+              </div>
+            </div>
+          </div>
+        </Link>
+        <Link to="allconference">
+          <div className=" outer_box">
+            <div className="conference">
+              <div className="overlay">
+                <header>Conferences</header>
+              </div>
+            </div>
+          </div>
+        </Link>
+        <Link to="alljournal">
+          <div className=" outer_box">
+            <div className="journal">
+              <div className="overlay">
+                <header>Journals</header>
+              </div>
+            </div>
+          </div>
+        </Link>
       </div>
     );
   }

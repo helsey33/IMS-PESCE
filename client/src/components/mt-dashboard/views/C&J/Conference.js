@@ -148,42 +148,6 @@ class Conference extends Component {
     const { conference, loading } = this.props.conference;
     const { conferenceSet } = this.state;
 
-    //For exporting CSV
-    const headers = [
-      { label: "Conference Type", key: "cType" },
-      { label: "Paper Title", key: "paperTitle" },
-      { label: "Conference Title", key: "conferenceTitle" },
-      { label: "Organized By", key: "organizedBy" },
-      { label: "ISBN No", key: "isbnNo" },
-      { label: "Publisher", key: "publisher" },
-      { label: "Authors", key: "authors" },
-      { label: "Conference Date", key: "conferenceDate" }
-    ];
-
-    const data = this.state.conferenceSet.map(data => ({
-      cType: data.cType,
-      paperTitle: data.paperTitle,
-      conferenceTitle: data.conferenceTitle,
-      organizedBy: data.organizedBy,
-      isbnNo: data.isbnNo,
-      publisher: data.publisher,
-      authors: data.authors,
-      conferenceDate: moment(data.conferenceDate).format("MMM YYYY")
-    }));
-
-    data.unshift({
-      cType: "",
-      paperTitle: "",
-      conferenceTitle: "",
-      organizedBy: "",
-      isbnNo: "",
-      publisher: "",
-      authors: "",
-      conferenceDate: ""
-    });
-
-    // data unshift to add a blank row
-
     let conferenceContent;
     if (conference === null || loading) {
       conferenceContent = (
@@ -192,6 +156,42 @@ class Conference extends Component {
         </div>
       );
     } else if (Object.keys(conference).length > 0) {
+      //For exporting CSV
+      const headers = [
+        { label: "Conference Type", key: "cType" },
+        { label: "Paper Title", key: "paperTitle" },
+        { label: "Conference Title", key: "conferenceTitle" },
+        { label: "Organized By", key: "organizedBy" },
+        { label: "ISBN No", key: "isbnNo" },
+        { label: "Publisher", key: "publisher" },
+        { label: "Authors", key: "authors" },
+        { label: "Conference Date", key: "conferenceDate" }
+      ];
+
+      const data = this.state.conferenceSet.map(data => ({
+        cType: data.cType,
+        paperTitle: data.paperTitle,
+        conferenceTitle: data.conferenceTitle,
+        organizedBy: data.organizedBy,
+        isbnNo: data.isbnNo,
+        publisher: data.publisher,
+        authors: data.authors,
+        conferenceDate: moment(data.conferenceDate).format("MMM YYYY")
+      }));
+
+      data.unshift({
+        cType: "",
+        paperTitle: "",
+        conferenceTitle: "",
+        organizedBy: "",
+        isbnNo: "",
+        publisher: "",
+        authors: "",
+        conferenceDate: ""
+      });
+
+      // data unshift to add a blank row
+
       conferenceContent = (
         <div>
           <GridContainer>

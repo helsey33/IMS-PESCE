@@ -18,6 +18,24 @@ export const getConference = () => dispatch => {
     });
 };
 
+export const getConferenceAll = () => dispatch => {
+  dispatch(setPageLoading());
+  axios
+    .get("/api/conference/all")
+    .then(res => {
+      dispatch({
+        type: "GET_CONFERENCE_ALL",
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: "GET_CONFERENCE_ALL",
+        payload: {}
+      });
+    });
+};
+
 export const addConferenceDetails = (
   conferenceDetails,
   history

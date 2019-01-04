@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import {
-  getCurrentProfile,
+  getProfileByHandle,
   deleteGradDetails,
   deletePreGradDetails,
   deleteWorkExperience,
@@ -93,7 +93,7 @@ const styles = {
   }
 };
 
-class UserProfile extends Component {
+class ProfileByHandle extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -105,7 +105,8 @@ class UserProfile extends Component {
     };
   }
   componentWillMount = () => {
-    this.props.getCurrentProfile();
+    const { handle } = this.props.match.params;
+    this.props.getProfileByHandle(handle);
   };
 
   componentWillReceiveProps(nextProps) {
@@ -266,7 +267,10 @@ class UserProfile extends Component {
                     htmlFor="raised-button-file"
                     style={{ cursor: "pointer" }}
                   >
-                    <img src={this.state.displayImage} alt="Profile_Image" />
+                    <img
+                      src={"../" + this.state.displayImage}
+                      alt="Profile_Image"
+                    />
                   </label>
                 </CardAvatar>
                 <CardBody profile>
@@ -488,11 +492,11 @@ export default withStyles(styles)(
   connect(
     mapStateToProps,
     {
-      getCurrentProfile,
+      getProfileByHandle,
       deleteGradDetails,
       deletePreGradDetails,
       deleteWorkExperience,
       deleteProject
     }
-  )(UserProfile)
+  )(ProfileByHandle)
 );

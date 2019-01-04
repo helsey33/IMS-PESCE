@@ -18,6 +18,41 @@ export const getCurrentProfile = () => dispatch => {
     });
 };
 
+export const getAllProfiles = () => dispatch => {
+  dispatch(setProfileLoading());
+  axios
+    .get("/api/profile/all")
+    .then(res => {
+      dispatch({
+        type: "GET_PROFILE_ALL",
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: "GET_PROFILE",
+        payload: {}
+      });
+    });
+};
+
+export const getProfileByHandle = handle => dispatch => {
+  axios
+    .get(`/api/profile/handle/${handle}`)
+    .then(res => {
+      dispatch({
+        type: "GET_PROFILE",
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: "GET_PROFILE",
+        payload: {}
+      });
+    });
+};
+
 export const createProfile = (profileData, history) => dispatch => {
   axios
     .post("/api/profile/", profileData)

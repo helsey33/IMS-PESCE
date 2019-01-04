@@ -18,6 +18,24 @@ export const getJournal = () => dispatch => {
     });
 };
 
+export const getJournalAll = () => dispatch => {
+  dispatch(setPageLoading());
+  axios
+    .get("/api/journal/all")
+    .then(res => {
+      dispatch({
+        type: "GET_JOURNAL_ALL",
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: "GET_JOURNAL_ALL",
+        payload: {}
+      });
+    });
+};
+
 export const addJournalDetails = (journalDetails, history) => dispatch => {
   axios
     .post("/api/journal/", journalDetails)
