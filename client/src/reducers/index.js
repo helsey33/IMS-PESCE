@@ -4,11 +4,13 @@ import errorReducer from "./errorReducer";
 import profileReducer from "./profileReducer";
 import conferenceReducer from "./conferenceReducer";
 import journalReducer from "./journalReducer";
+import workshopReducer from "./workshopReducer";
 
 export default combineReducers({
   auth: authReducer,
   errors: errorReducer,
   profile: profileReducer,
   conference: conferenceReducer,
-  journal: journalReducer
+  journal: journalReducer,
+  workshop: workshopReducer
 });

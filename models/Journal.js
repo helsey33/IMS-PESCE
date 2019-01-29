@@ -76,4 +76,4 @@ const JournalSchema = new Schema({
   ]
 });
 
-module.exports = Journal = mongoose.model("jounral", JournalSchema);
+module.exports = Journal = mongoose.model("journal", JournalSchema);

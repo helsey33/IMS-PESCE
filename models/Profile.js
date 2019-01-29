@@ -8,7 +8,7 @@ const ProfileSchema = new Schema({
   },
   displayImage: {
     type: String,
-    default: "uploads/displayImage/default-user.png"
+    default: "uploads/profile/default-user.png"
   },
   handle: {
     type: String,
@@ -107,6 +107,32 @@ const ProfileSchema = new Schema({
       year: {
         type: String,
         required: true
+      }
+    }
+  ],
+  workshop: [
+    {
+      title: {
+        type: String,
+        required: true
+      },
+      start_date: {
+        type: Date,
+        required: true
+      },
+      end_date: {
+        type: Date,
+        required: true
+      },
+      organized_by: {
+        type: String,
+        required: true
+      },
+      certificate: {
+        type: String
+      },
+      report: {
+        type: String
       }
     }
   ]

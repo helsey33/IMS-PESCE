@@ -1,7 +1,7 @@
 {
   "name": "ims-pesce",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend for IMS-PESCE",
   "main": "index.js",
   "scripts": {
     "cleint-install": "npm install --prefix client",

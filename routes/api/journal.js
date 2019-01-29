@@ -3,7 +3,6 @@ const moment = require("moment");
 const router = express.Router();
 const passport = require("passport");
 const multer = require("multer");
-var path = require("path");
 
 //Bring in the models
 const Journal = require("../../models/Journal");
@@ -56,18 +55,12 @@ router.post(
 );
 
 //@route GET journal/downloadPaper : Private
-router.get(
-  "/downloadPaper/:jid",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    Journal.findOne({ user: req.user.id }).then(journal => {
-      const jData = journal.journalData.find(
-        item => item.id === req.params.jid
-      );
-      res.download(jData.paper);
-    });
-  }
-);
+router.get("/downloadPaper/:jid", (req, res) => {
+  Journal.findOne({ "journalData._id": req.params.jid }).then(journal => {
+    const jData = journal.journalData.find(item => item.id === req.params.jid);
+    res.send(jData.paper);
+  });
+});
 
 //@route POST /journal : Private
 router.post(

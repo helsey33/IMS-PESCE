@@ -41,6 +41,15 @@ class AdminArea extends Component {
             </div>
           </div>
         </Link>
+        <Link to="allworkshop">
+          <div className=" outer_box">
+            <div className="workshop">
+              <div className="overlay">
+                <header>Workshop</header>
+              </div>
+            </div>
+          </div>
+        </Link>
       </div>
     );
   }

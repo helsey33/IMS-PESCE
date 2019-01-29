@@ -8,10 +8,7 @@ import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
 import { CSVLink } from "react-csv";
 
-import {
-  getConferenceAll,
-  deleteConferenceDetail
-} from "../../../../actions/conferenceActions";
+import { getConferenceAll } from "../../../../actions/conferenceActions";
 import Card from "../../components/Card/Card";
 // import CardHeader from "../../components/Card/CardHeader";
 import CardBody from "../../components/Card/CardBody";
@@ -64,10 +61,6 @@ class Conference extends Component {
     this.props.getConferenceAll();
   };
 
-  deleteConferenceDetails = id => {
-    this.props.deleteConferenceDetail(id);
-  };
-
   onPaperUpload = (id, e) => {
     const fd = new FormData();
     fd.append("paper", e.target.files[0], e.target.files[0].name);
@@ -80,7 +73,9 @@ class Conference extends Component {
   };
 
   downloadPaper(id) {
-    axios.get(`/api/conference/downloadPaper/${id}`).then(res => {});
+    axios.get(`/api/conference/downloadPaper/${id}`).then(res => {
+      window.open(`http://localhost:5000/${res.data}`);
+    });
   }
 
   onCertUpload = (id, e) => {
@@ -451,18 +446,6 @@ class Conference extends Component {
                             </label>
                           </GridItem>
                         )}
-                        <GridItem md={3} sm={3}>
-                          <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={this.deleteConferenceDetails.bind(
-                              this,
-                              data._id
-                            )}
-                          >
-                            Delete Details
-                          </Button>
-                        </GridItem>
                       </GridContainer>
                     </div>
                   </CardBody>
@@ -477,12 +460,7 @@ class Conference extends Component {
         <GridContainer>
           <GridItem md={8}>
             <div>
-              <h4 className={classes.cardTitle}>
-                You haven't yet set up any conference details.
-              </h4>
-              <Link to="/addconference" className={classes.cardLink}>
-                Add details
-              </Link>
+              <h4 className={classes.cardTitle}>No details found.</h4>
             </div>
           </GridItem>
         </GridContainer>
@@ -500,6 +478,6 @@ const mapStateToProps = state => ({
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { getConferenceAll, deleteConferenceDetail }
+    { getConferenceAll }
   )(Conference)
 );

@@ -79,7 +79,9 @@ class Conference extends Component {
   };
 
   downloadPaper(id) {
-    axios.get(`/api/conference/downloadPaper/${id}`).then(res => {});
+    axios.get(`/api/conference/downloadPaper/${id}`).then(res => {
+      window.open(`http://localhost:5000/${res.data}`);
+    });
   }
 
   onCertUpload = (id, e) => {
@@ -116,7 +118,6 @@ class Conference extends Component {
     this.setState({
       conferenceSet: filteredSet
     });
-    console.log();
   }
 
   onDatePick({ startDate, endDate }) {

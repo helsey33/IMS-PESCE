@@ -26,8 +26,10 @@ import WorkExperience from "./../../views/UserProfile/WorkExperience";
 import AddProject from "./../../views/UserProfile/AddProject";
 import AddConference from "./../../views/C&J/AddConference";
 import AddJournal from "./../../views/C&J/AddJournal";
+import AddWorkshop from "./../../views/Workshop/AddWorkshop";
 import AllConference from "./../../views/AdminArea/AllConference";
 import AllJournal from "./../../views/AdminArea/AllJournal";
+import AllWorkshop from "./../../views/AdminArea/AllWorkshop";
 import AllPRofiles from "./../../views/AdminArea/AllProfiles";
 import ProfileByHandle from "./../../views/AdminArea/ProfileByHandle";
 
@@ -40,8 +42,10 @@ const switchRoutes = (
     <Route path="/addproject" component={AddProject} />
     <Route path="/addconference" component={AddConference} />
     <Route path="/addjournal" component={AddJournal} />
+    <Route path="/addworkshop" component={AddWorkshop} />
     <Route path="/allconference" component={AllConference} />
     <Route path="/alljournal" component={AllJournal} />
+    <Route path="/allworkshop" component={AllWorkshop} />
     <Route path="/allprofiles" component={AllPRofiles} />
     <Route path="/handle/:handle" component={ProfileByHandle} />
     {dashboardRoutes.map((prop, key) => {

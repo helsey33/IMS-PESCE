@@ -18,7 +18,7 @@ const validateGradProjectInput = require("../../validation/grad_project");
 //Multer config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./uploads/displayImage/");
+    cb(null, "./uploads/profile/");
   },
   filename: (req, file, cb) => {
     cb(null, req.user.id + "_" + file.originalname);
@@ -339,6 +339,100 @@ router.delete(
         profile.save().then(profile => res.json(profile));
       })
       .catch(err => res.status(404).json(err));
+  }
+);
+
+const uploadCert = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype === "image/jpeg" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/png"
+    ) {
+      cb(null, true);
+    } else {
+      cb("Error : Only images allowed");
+    }
+  }
+}).single("certificate");
+
+const uploadReport = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype === "application/pdf" ||
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      cb(null, true);
+    } else {
+      cb("Error : Only word or pdf allowed");
+    }
+  }
+}).single("report");
+
+router.post(
+  "/workshop",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    console.log(req.body);
+    const { errors, isValid } = validateWorkshopInput(req.body);
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      const newDetails = {
+        title: req.body.title,
+        start_date: req.body.start_date,
+        end_date: req.body.end_date,
+        organized_by: req.body.organized_by
+      };
+
+      profile.workshop.push(newDetails);
+
+      profile.save().then(profile => res.json(profile));
+    });
+  }
+);
+
+router.post(
+  "/uploadCert/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    uploadCert(req, res, err => {
+      if (err) res.status(400).json(err);
+      else
+        Profile.findOneAndUpdate(
+          { "workshop._id": req.params.id },
+          { $set: { "workshop.$.certificate": req.file.path } },
+          { new: true }
+        )
+          .then(profile => {
+            res.json(profile.workshop);
+          })
+          .catch(err => res.status(400).json({ err: "Workshop not found" }));
+    });
+  }
+);
+
+router.post(
+  "/uploadReport/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    uploadReport(req, res, err => {
+      if (err) res.status(400).json(err);
+      else
+        Profile.findOneAndUpdate(
+          { "workshop._id": req.params.id },
+          { $set: { "workshop.$.report": req.file.path } },
+          { new: true }
+        )
+          .then(profile => {
+            res.json(profile.workshop);
+          })
+          .catch(err => res.status(400).json({ err: "Workshop not found" }));
+    });
   }
 );
 

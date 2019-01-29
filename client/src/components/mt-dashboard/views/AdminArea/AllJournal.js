@@ -69,9 +69,9 @@ class AllJournal extends Component {
   };
 
   downloadPaper(id) {
-    axios
-      .get(`/api/journal/downloadPaper/${id}`)
-      .then(res => console.log("success"));
+    axios.get(`/api/journal/downloadPaper/${id}`).then(res => {
+      window.open(`http://localhost:5000/${res.data}`);
+    });
   }
 
   searchByHandle(e) {

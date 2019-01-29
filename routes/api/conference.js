@@ -89,18 +89,16 @@ router.post(
 );
 
 //@route GET confernece/downloadPaper : Private
-router.get(
-  "/downloadPaper/:cid",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    Conference.findOne({ user: req.user.id }).then(conference => {
+router.get("/downloadPaper/:cid", (req, res) => {
+  Conference.findOne({ "conferenceData._id": req.params.cid }).then(
+    conference => {
       const cData = conference.conferenceData.find(
         item => item.id === req.params.cid
       );
-      res.download(cData.paper);
-    });
-  }
-);
+      res.send(cData.paper);
+    }
+  );
+});
 
 //@route POST /conference : Private
 router.post(
@@ -199,7 +197,7 @@ router.get("/all", (req, res) => {
     });
 });
 
-//@route DELETE /conference/:jid
+//@route DELETE /conference/:cid
 router.delete(
   "/:cid",
   passport.authenticate("jwt", { session: false }),

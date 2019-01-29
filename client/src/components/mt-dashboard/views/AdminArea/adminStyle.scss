@@ -26,18 +26,18 @@
   width: 100%;
   transition: all 0.5s;
   &:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
   }
 }
 
 .conference {
-  background: url("conference.jpg") no-repeat center center;
+  background: url("conference.png") no-repeat center center;
   background-size: cover;
   height: 100%;
   width: 100%;
   transition: all 0.5s;
   &:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
   }
 }
 
@@ -48,6 +48,17 @@
   width: 100%;
   transition: all 0.5s;
   &:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
+  }
+}
+
+.workshop {
+  background: url("workshop.png") no-repeat center center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  transition: all 0.5s;
+  &:hover {
+    transform: scale(1.005);
   }
 }

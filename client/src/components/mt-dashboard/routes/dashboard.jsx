@@ -3,10 +3,13 @@ import Person from "@material-ui/icons/Person";
 import Forum from "@material-ui/icons/Forum";
 import ChromeReaderMode from "@material-ui/icons/ChromeReaderMode";
 import VerifiedUser from "@material-ui/icons/VerifiedUser";
+import Build from "@material-ui/icons/Build";
+
 import UserProfile from "../views/UserProfile/UserProfile.jsx";
 import Conference from "../views/C&J/Conference";
 import Journal from "../views/C&J/Journal";
 import AdminArea from "../views/AdminArea/AdminArea";
+import Workshop from "../views/Workshop/Workshop";
 
 const dashboardRoutes = [
   {
@@ -29,6 +32,13 @@ const dashboardRoutes = [
     navbarName: "Journal",
     icon: ChromeReaderMode,
     component: Journal
+  },
+  {
+    path: "/workshop",
+    sidebarName: "Workshop",
+    navbarName: "Workshop",
+    icon: Build,
+    component: Workshop
   },
   {
     path: "/adminarea",
@@ -82,6 +92,12 @@ const dashboardRoutes = [
   },
   {
     redirect: true,
+    path: "/addworkshop",
+    to: "/addworkshop",
+    navbarName: "Workshop Details"
+  },
+  {
+    redirect: true,
     path: "/allconference",
     to: "/allconference",
     navbarName: "All Conferences"
@@ -91,6 +107,12 @@ const dashboardRoutes = [
     path: "/alljournal",
     to: "/alljournal",
     navbarName: "All Journals"
+  },
+  {
+    redirect: true,
+    path: "/allworkshop",
+    to: "/allworkshop",
+    navbarName: "All Workshops"
   },
   {
     redirect: true,

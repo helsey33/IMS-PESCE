@@ -4,13 +4,12 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 const path = require("path");
 
-const User = require("./models/User");
-
 //Bring in routes
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
 const conference = require("./routes/api/conference");
 const journal = require("./routes/api/journal");
+const workshop = require("./routes/api/workshop");
 
 const app = express();
 
@@ -43,6 +42,12 @@ app.use("/api/users", users);
 app.use("/api/profile", profile);
 app.use("/api/conference", conference);
 app.use("/api/journal", journal);
+app.use("/api/workshop", workshop);
+
+app.use(express.static("client/build"));
+app.get("*", (req, res) => {
+  res.render(path.resolve(__dirname, "client", "build", "index.html"));
+});
 
 const port = process.env.PORT || 5000;
 

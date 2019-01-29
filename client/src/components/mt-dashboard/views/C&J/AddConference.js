@@ -265,8 +265,7 @@ class AddConference extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  errors: state.errors,
-  profile: state.profile
+  errors: state.errors
 });
 
 export default withStyles(styles)(
