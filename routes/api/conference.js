@@ -88,7 +88,7 @@ router.post(
   }
 );
 
-//@route GET confernece/downloadPaper : Private
+//@route GET confernece/downloadPaper :
 router.get("/downloadPaper/:cid", (req, res) => {
   Conference.findOne({ "conferenceData._id": req.params.cid }).then(
     conference => {
